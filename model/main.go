@@ -7,7 +7,7 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"one-api/common"
-	"os"
+	"one-api/configuration"
 	"strings"
 	"time"
 )
@@ -38,8 +38,8 @@ func createRootAccountIfNeed() error {
 }
 
 func chooseDB() (*gorm.DB, error) {
-	if os.Getenv("SQL_DSN") != "" {
-		dsn := os.Getenv("SQL_DSN")
+	if configuration.Configuration.SqlDsn != "" {
+		dsn := configuration.Configuration.SqlDsn
 		if strings.HasPrefix(dsn, "postgres://") {
 			// Use PostgreSQL
 			common.SysLog("using PostgreSQL as database")

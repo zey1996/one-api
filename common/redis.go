@@ -3,7 +3,7 @@ package common
 import (
 	"context"
 	"github.com/go-redis/redis/v8"
-	"os"
+	"one-api/configuration"
 	"time"
 )
 
@@ -12,18 +12,18 @@ var RedisEnabled = true
 
 // InitRedisClient This function is called after init()
 func InitRedisClient() (err error) {
-	if os.Getenv("REDIS_CONN_STRING") == "" {
+	if configuration.Configuration.RedisConnString == "" {
 		RedisEnabled = false
 		SysLog("REDIS_CONN_STRING not set, Redis is not enabled")
 		return nil
 	}
-	if os.Getenv("SYNC_FREQUENCY") == "" {
+	if configuration.Configuration.SyncFrequency == "" {
 		RedisEnabled = false
 		SysLog("SYNC_FREQUENCY not set, Redis is disabled")
 		return nil
 	}
 	SysLog("Redis is enabled")
-	opt, err := redis.ParseURL(os.Getenv("REDIS_CONN_STRING"))
+	opt, err := redis.ParseURL(configuration.Configuration.RedisConnString)
 	if err != nil {
 		FatalLog("failed to parse Redis connection string: " + err.Error())
 	}
@@ -40,7 +40,7 @@ func InitRedisClient() (err error) {
 }
 
 func ParseRedisOption() *redis.Options {
-	opt, err := redis.ParseURL(os.Getenv("REDIS_CONN_STRING"))
+	opt, err := redis.ParseURL(configuration.Configuration.RedisConnString)
 	if err != nil {
 		FatalLog("failed to parse Redis connection string: " + err.Error())
 	}

@@ -335,9 +335,9 @@ func UpdateAllChannelsBalance(c *gin.Context) {
 	return
 }
 
-func AutomaticallyUpdateChannels(frequency int) {
+func AutomaticallyUpdateChannels(frequency time.Duration) {
 	for {
-		time.Sleep(time.Duration(frequency) * time.Minute)
+		time.Sleep(frequency)
 		common.SysLog("updating all channels")
 		_ = updateAllChannelsBalance()
 		common.SysLog("channels update done")

@@ -4,12 +4,12 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"one-api/configuration"
 	"os"
 	"path/filepath"
 )
 
 var (
-	Port         = flag.Int("port", 3000, "the listening port")
 	PrintVersion = flag.Bool("version", false, "print version and exit")
 	PrintHelp    = flag.Bool("help", false, "print help and exit")
 	LogDir       = flag.String("log-dir", "./logs", "specify the log directory")
@@ -35,15 +35,15 @@ func init() {
 		os.Exit(0)
 	}
 
-	if os.Getenv("SESSION_SECRET") != "" {
-		if os.Getenv("SESSION_SECRET") == "random_string" {
+	if configuration.Configuration.SessionSecret != "" {
+		if configuration.Configuration.SessionSecret == "random_string" {
 			SysError("SESSION_SECRET is set to an example value, please change it to a random string.")
 		} else {
-			SessionSecret = os.Getenv("SESSION_SECRET")
+			SessionSecret = configuration.Configuration.SessionSecret
 		}
 	}
-	if os.Getenv("SQLITE_PATH") != "" {
-		SQLitePath = os.Getenv("SQLITE_PATH")
+	if configuration.Configuration.SqlitePath != "" {
+		SQLitePath = configuration.Configuration.SqlitePath
 	}
 	if *LogDir != "" {
 		var err error

@@ -1,0 +1,24 @@
+permission: &permission
+  id: modelperm-LwHkVFn8AcMItP432fKKDIKJ
+  object: model_permission
+  created: 1626777600
+  allowcreateengine: true
+  allowsampling: true
+  allowlogprobs: true
+  allowsearchindices: false
+  allowview: true
+  allowfinetuning: false
+  organization: '*'
+  group: null
+  isblocking: false
+
+models:
+  - id: SparkDesk
+    object: model
+    created: 1677649963
+    ownedby: xunfei
+    permission:
+      - <<: *permission
+    root: SparkDesk
+    parent: null
+    

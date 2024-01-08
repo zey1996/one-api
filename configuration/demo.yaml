@@ -1,0 +1,6 @@
+ginMode: "" # debug
+channelUpdateFrequency: 0s
+channelTestFrequency: 0s
+batchUpdateEnabled: false
+port: 3001
+sqlDsn: root:123456@tcp(localhost:13306)/chat?charset=utf8&parseTime=True&loc=Local&timeout=10s

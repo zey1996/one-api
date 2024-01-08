@@ -7,11 +7,11 @@ import (
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"one-api/common"
+	"one-api/configuration"
 	"one-api/controller"
 	"one-api/middleware"
 	"one-api/model"
 	"one-api/router"
-	"os"
 	"strconv"
 )
 
@@ -21,7 +21,8 @@ var buildFS embed.FS
 func main() {
 	common.SetupLogger()
 	common.SysLog(fmt.Sprintf("One API %s started", common.Version))
-	if os.Getenv("GIN_MODE") != "debug" {
+	//if os.Getenv("GIN_MODE") != "debug" {
+	if configuration.Configuration.GinMode != "debug" {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	if common.DebugEnabled {
@@ -47,7 +48,6 @@ func main() {
 
 	// Initialize options
 	model.InitOptionMap()
-	common.SysLog(fmt.Sprintf("using theme %s", common.Theme))
 	if common.RedisEnabled {
 		// for compatibility with old versions
 		common.MemoryCacheEnabled = true
@@ -61,21 +61,21 @@ func main() {
 		go model.SyncOptions(common.SyncFrequency)
 		go model.SyncChannelCache(common.SyncFrequency)
 	}
-	if os.Getenv("CHANNEL_UPDATE_FREQUENCY") != "" {
-		frequency, err := strconv.Atoi(os.Getenv("CHANNEL_UPDATE_FREQUENCY"))
-		if err != nil {
-			common.FatalLog("failed to parse CHANNEL_UPDATE_FREQUENCY: " + err.Error())
-		}
-		go controller.AutomaticallyUpdateChannels(frequency)
+	if configuration.Configuration.ChannelUpdateFrequency != 0 {
+		//frequency, err := strconv.Atoi(os.Getenv("CHANNEL_UPDATE_FREQUENCY"))
+		//if err != nil {
+		//	common.FatalLog("failed to parse CHANNEL_UPDATE_FREQUENCY: " + err.Error())
+		//}
+		go controller.AutomaticallyUpdateChannels(configuration.Configuration.ChannelUpdateFrequency)
 	}
-	if os.Getenv("CHANNEL_TEST_FREQUENCY") != "" {
-		frequency, err := strconv.Atoi(os.Getenv("CHANNEL_TEST_FREQUENCY"))
-		if err != nil {
-			common.FatalLog("failed to parse CHANNEL_TEST_FREQUENCY: " + err.Error())
-		}
-		go controller.AutomaticallyTestChannels(frequency)
+	if configuration.Configuration.ChannelTestFrequency != 0 {
+		//frequency, err := strconv.Atoi(os.Getenv("CHANNEL_TEST_FREQUENCY"))
+		//if err != nil {
+		//	common.FatalLog("failed to parse CHANNEL_TEST_FREQUENCY: " + err.Error())
+		//}
+		go controller.AutomaticallyTestChannels(configuration.Configuration.ChannelTestFrequency)
 	}
-	if os.Getenv("BATCH_UPDATE_ENABLED") == "true" {
+	if configuration.Configuration.BatchUpdateEnabled {
 		common.BatchUpdateEnabled = true
 		common.SysLog("batch update enabled with interval " + strconv.Itoa(common.BatchUpdateInterval) + "s")
 		model.InitBatchUpdater()
@@ -94,11 +94,8 @@ func main() {
 	server.Use(sessions.Sessions("session", store))
 
 	router.SetRouter(server, buildFS)
-	var port = os.Getenv("PORT")
-	if port == "" {
-		port = strconv.Itoa(*common.Port)
-	}
-	err = server.Run(":" + port)
+
+	err = server.Run(fmt.Sprintf(":%d", configuration.Configuration.PORT))
 	if err != nil {
 		common.FatalLog("failed to start HTTP server: " + err.Error())
 	}
